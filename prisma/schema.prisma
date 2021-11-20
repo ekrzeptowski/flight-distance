@@ -2,7 +2,7 @@
 // learn more about it in the docs: https://pris.ly/d/prisma-schema
 
 datasource db {
-  provider = "postgresql"
+  provider = "mysql"
   url      = env("DATABASE_URL")
 }
 
@@ -11,7 +11,7 @@ generator client {
 }
 
 model Account {
-  id                 Int       @default(autoincrement()) @id
+  id                 Int       @id @default(autoincrement())
   compoundId         String    @unique @map(name: "compound_id")
   userId             Int       @map(name: "user_id")
   providerType       String    @map(name: "provider_type")
@@ -23,15 +23,15 @@ model Account {
   createdAt          DateTime  @default(now()) @map(name: "created_at")
   updatedAt          DateTime  @default(now()) @map(name: "updated_at")
 
+
   @@index([providerAccountId], name: "providerAccountId")
   @@index([providerId], name: "providerId")
   @@index([userId], name: "userId")
-
   @@map(name: "accounts")
 }
 
 model Session {
-  id           Int      @default(autoincrement()) @id
+  id           Int      @id @default(autoincrement())
   userId       Int      @map(name: "user_id")
   expires      DateTime
   sessionToken String   @unique @map(name: "session_token")
@@ -43,7 +43,7 @@ model Session {
 }
 
 model User {
-  id            Int       @default(autoincrement()) @id
+  id            Int       @id @default(autoincrement())
   name          String?
   email         String?   @unique
   emailVerified DateTime? @map(name: "email_verified")
@@ -55,7 +55,7 @@ model User {
 }
 
 model VerificationRequest {
-  id         Int      @default(autoincrement()) @id
+  id         Int      @id @default(autoincrement())
   identifier String
   token      String   @unique
   expires    DateTime
@@ -63,4 +63,69 @@ model VerificationRequest {
   updatedAt  DateTime @default(now()) @map(name: "updated_at")
 
   @@map(name: "verification_requests")
+}
+
+model Continent {
+  id      Int       @id @default(autoincrement())
+  code    String    @unique @db.Char(2)
+  region  Region[]
+  country Country[]
+  airport Airport[]
+}
+
+model Country {
+  id            Int       @id
+  code          String    @unique @db.Char(2)
+  name          String    @unique
+  continent     Continent @relation(fields: [continentId], references: [id])
+  wikipediaLink String
+  keywords      String
+  region        Region[]
+  airport       Airport[]
+
+  continentId Int
+}
+
+model Region {
+  id            Int       @id
+  code          String    @unique
+  localCode     String
+  name          String
+  continent     Continent @relation(fields: [continentId], references: [id])
+  country       Country   @relation(fields: [countryId], references: [id])
+  wikipediaLink String
+  keywords      String
+  airport       Airport[]
+
+  continentId Int
+  countryId   Int
+}
+
+model Airport {
+  id               Int         @id
+  ident            String      @unique
+  type             AirportType @relation(fields: [airportTypeId], references: [id])
+  name             String
+  latitudeDeg      Decimal     @db.Decimal(15, 13)
+  longitudeDeg     Decimal     @db.Decimal(16, 13)
+  elevationFt      Int
+  continent        Continent   @relation(fields: [continentId], references: [id])
+  country          Country     @relation(fields: [countryId], references: [id])
+  region           Region      @relation(fields: [regionId], references: [id])
+  municipality     String
+  scheduledService Boolean
+  homeLink         String
+  wikipediaLink    String
+  keywords         String      @db.VarChar(4096)
+
+  continentId   Int
+  countryId     Int
+  regionId      Int
+  airportTypeId Int
+}
+
+model AirportType {
+  id      Int       @id @default(autoincrement())
+  type    String    @unique
+  airport Airport[]
 }
