@@ -1,6 +1,6 @@
 {
-  "name": "prisma-next-auth-graphql-starter",
-  "version": "3.1.0",
+  "name": "flight-distance",
+  "version": "0.1.0",
   "description": "",
   "scripts": {
     "start": "next start",
@@ -26,12 +26,11 @@
   },
   "keywords": [
     "prisma",
-    "starter",
     "fullstack",
     "auth"
   ],
-  "author": "Taras Protchenko",
-  "license": "ISC",
+  "author": "Ewelina Krzeptowska <kontakt@ekrzeptowski.pl>",
+  "private": true,
   "dependencies": {
     "@apollo/client": "3.4.16",
     "@prisma/client": "^3.5.0",
