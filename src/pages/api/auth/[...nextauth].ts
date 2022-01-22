@@ -41,5 +41,12 @@ const options = {
     prisma,
   }),
 
+  callbacks: {
+    session: async (session, user) => {
+      session.user.userId = user.id as number;
+      return Promise.resolve(session);
+    },
+  } as NextAuthOptions["callbacks"],
+
   secret: process.env.AUTH_SECRET,
 }
