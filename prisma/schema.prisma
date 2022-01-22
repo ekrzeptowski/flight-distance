@@ -51,6 +51,7 @@ model User {
   createdAt     DateTime  @default(now()) @map(name: "created_at")
   updatedAt     DateTime  @default(now()) @map(name: "updated_at")
 
+  Travel Travel[]
   @@map(name: "users")
 }
 
@@ -117,15 +118,31 @@ model Airport {
   homeLink         String
   wikipediaLink    String
   keywords         String      @db.VarChar(4096)
+  startingAirport  Travel[]    @relation("StartingAirport")
+  endingAirport    Travel[]    @relation("EndingAirport")
 
   continentId   Int
   countryId     Int
   regionId      Int
   airportTypeId Int
+
 }
 
 model AirportType {
   id      Int       @id @default(autoincrement())
   type    String    @unique
   airport Airport[]
+}
+
+model Travel {
+  id            Int      @id @default(autoincrement())
+  from          Airport  @relation("StartingAirport", fields: [fromAirportId], references: [id])
+  to            Airport  @relation("EndingAirport", fields: [toAirportId], references: [id])
+  user          User     @relation(fields: [userId], references: [id])
+  departureDate DateTime
+  arrivalDate   DateTime
+
+  userId        Int
+  fromAirportId Int
+  toAirportId   Int
 }
